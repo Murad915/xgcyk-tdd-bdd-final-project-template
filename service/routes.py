@@ -97,6 +97,70 @@ def create_products():
 ######################################################################
 # L I S T   A L L   P R O D U C T S
 ######################################################################
+######################################################################
+# R E A D   A   P R O D U C T
+######################################################################
+@app.route("/products/<int:product_id>", methods=["GET"])
+def get_products(product_id):
+    """
+    Retrieve a single Product
+    This endpoint will return a Product based on its id
+    """
+    app.logger.info("Request to get Product with id: %s", product_id)
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id [{product_id}] not found")
+    
+    return jsonify(product.serialize()), status.HTTP_200_OK
+
+######################################################################
+# U P D A T E   A   P R O D U C T
+######################################################################
+@app.route("/products/<int:product_id>", methods=["PUT"])
+def update_product(product_id):
+    """
+    Update a Product
+    This endpoint will update a Product based on its id
+    """
+    app.logger.info("Request to update Product with id: %s", product_id)
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id [{product_id}] not found")
+    
+    product.deserialize(request.get_json())
+    product.update()
+
+    return jsonify(product.serialize()), status.HTTP_200_OK
+
+######################################################################
+# D E L E T E   A   P R O D U C T
+######################################################################
+@app.route("/products/<int:product_id>", methods=["DELETE"])
+def delete_product(product_id):
+    """
+    Delete a Product
+    This endpoint will delete a Product based on its id
+    """
+    app.logger.info("Request to delete Product with id: %s", product_id)
+    product = Product.find(product_id)
+    if product:
+        product.delete()
+
+    return "", status.HTTP_204_NO_CONTENT
+
+######################################################################
+# L I S T   A L L   P R O D U C T S
+######################################################################
+@app.route("/products", methods=["GET"])
+def list_products():
+    """
+    List all Products
+    This endpoint will list all Products
+    """
+    app.logger.info("Request to list Products")
+    products = Product.all()
+    results = [product.serialize() for product in products]
+    return jsonify(results), status.HTTP_200_OK
 
 #
 # PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
